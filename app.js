@@ -1,12 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const User = require("./models/user");
+const primaryTracking = require("./models/primarytracking");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const MongoStore = require("connect-mongo");
 
 const app = express();
 require("dotenv").config();
@@ -24,11 +24,12 @@ app.use(
 
 // mongoose
 const mongoUrl = process.env.mongo_url;
+const dburl = "mongodb://localhost:27017/rupeerise";
 main()
   .then(() => console.log("connected to database"))
   .catch((err) => console.log(err));
 async function main() {
-  await mongoose.connect(mongoUrl);
+  await mongoose.connect(dburl);
 }
 
 //session
@@ -39,8 +40,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true, // This means the cookie will only be sent over HTTPS.
-      expires: 60 * 1000,
+      secure: false, // This means the cookie will only be sent over HTTPS.
+      expires: 60 * 60 * 1000,
     },
   })
 );
@@ -54,10 +55,13 @@ passport.serializeUser(function (user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
+passport.deserializeUser(async function (id, done) {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (err) {
+    done(err);
+  }
 });
 
 //demouser
@@ -68,7 +72,7 @@ passport.deserializeUser(function (id, done) {
 //   res.send("Hello this is demouser");
 // });
 
-//root
+//roots
 app.get("/", (req, res) => {
   res.send("Hello this is root");
 });
@@ -78,11 +82,11 @@ app.post("/signup", async (req, res) => {
   let { username, fullname, password } = req.body;
   let newUser = new User({ username, fullname });
   const registerUser = await User.register(newUser, password);
-  console.log(registerUser);
   res.json({ message: "User created successfully" });
 });
 
 //login
+
 app.post("/login", passport.authenticate("local"), (req, res) => {
   res.json({ user: req.user.username });
 });
@@ -101,15 +105,32 @@ app.post("/logout", (req, res, next) => {
 //user
 app.get("/user", async (req, res) => {
   if (req.user) {
-    res.json({ user: req.user.username });
+    req.user.markModified("trackingArray");
+    await req.user.save();
+    const updatedUser = await User.findById(req.user._id);
+    res.json({
+      username: updatedUser.username,
+      trackingArray: updatedUser.trackingArray,
+    });
   } else {
-    res.status(403).json({ message: "Not authenticated" });
+    res.status(401).json({ message: "Not authenticated" });
   }
 });
 
-app.get("/some-route", (req, res) => {
-  console.log(req.user); // this is the deserialized user object
-  // rest of your route handler...
+//addtracking
+app.post("/addtracking", async (req, res) => {
+  if (req.user) {
+    let { name, target } = req.body;
+    let newTracking = new primaryTracking({ name, target, current: 0 });
+    await newTracking.save();
+
+    req.user.trackingArray.push(newTracking);
+    await req.user.save();
+
+    res.json({ message: "Tracking added successfully" });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
 });
 
 app.listen(8080, () => {
