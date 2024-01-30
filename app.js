@@ -7,6 +7,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+const Payment = require("./models/payment");
 
 const app = express();
 require("dotenv").config();
@@ -81,8 +82,16 @@ app.get("/", (req, res) => {
 app.post("/signup", async (req, res) => {
   let { username, fullname, password } = req.body;
   let newUser = new User({ username, fullname });
-  const registerUser = await User.register(newUser, password);
-  res.json({ message: "User created successfully" });
+  const registeredUser = await User.register(newUser, password);
+
+  req.login(registeredUser, (err) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ message: "Error logging in user" });
+    } else {
+      res.json({ message: "User created and logged in successfully" });
+    }
+  });
 });
 
 //login
@@ -107,7 +116,9 @@ app.get("/user", async (req, res) => {
   if (req.user) {
     req.user.markModified("trackingArray");
     await req.user.save();
-    const updatedUser = await User.findById(req.user._id);
+    const updatedUser = await User.findById(req.user._id).populate(
+      "trackingArray"
+    );
     res.json({
       username: updatedUser.username,
       trackingArray: updatedUser.trackingArray,
@@ -128,6 +139,38 @@ app.post("/addtracking", async (req, res) => {
     await req.user.save();
 
     res.json({ message: "Tracking added successfully" });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
+//addpayment
+app.post("/addpayment", async (req, res) => {
+  if (req.user) {
+    let { name, amount, date } = req.body;
+
+    // Populate the trackingArray
+    await req.user.populate("trackingArray");
+
+    let trackingid = req.user.trackingArray.find(
+      (tracking) => tracking.name === name
+    );
+
+    if (trackingid) {
+      trackingid.current = Number(trackingid.current) + Number(amount);
+      await trackingid.save();
+      let newPayment = new Payment({
+        trackingid: trackingid._id,
+        amount,
+        date,
+      });
+      await newPayment.save();
+      req.user.paymentArray.push(newPayment);
+      await req.user.save();
+      res.json({ message: "Payment added successfully" });
+    } else {
+      res.status(404).json({ message: "Tracking not found" });
+    }
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }
