@@ -12,16 +12,7 @@ const Payment = require("./models/payment");
 const app = express();
 require("dotenv").config();
 app.use(express.json());
-app.use(
-  cors({
-    origin: "http://localhost:5173", // or the specific origin you want to allow
-    methods: ["GET", "POST"],
-    credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
-    exposedHeaders: ["Set-Cookie"],
-    optionsSuccessStatus: 200,
-  })
-);
+app.use(cors({}));
 
 // mongoose
 const mongoUrl = process.env.mongo_url;
@@ -30,7 +21,7 @@ main()
   .then(() => console.log("connected to database"))
   .catch((err) => console.log(err));
 async function main() {
-  await mongoose.connect(dburl);
+  await mongoose.connect(mongoUrl);
 }
 
 //session
@@ -97,6 +88,7 @@ app.post("/signup", async (req, res) => {
 //login
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
+  console.log("req.user");
   res.json({ user: req.user.username });
 });
 
