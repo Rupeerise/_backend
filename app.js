@@ -12,8 +12,16 @@ const Payment = require("./models/payment");
 const app = express();
 require("dotenv").config();
 app.use(express.json());
-app.use(cors({}));
-
+app.use(
+  cors({
+    origin: "http://localhost:5173", // or the specific origin you want to allow
+    methods: ["GET", "POST"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+    exposedHeaders: ["Set-Cookie"],
+    optionsSuccessStatus: 200,
+  })
+);
 // mongoose
 const mongoUrl = process.env.mongo_url;
 const dburl = "mongodb://localhost:27017/rupeerise";
@@ -21,7 +29,7 @@ main()
   .then(() => console.log("connected to database"))
   .catch((err) => console.log(err));
 async function main() {
-  await mongoose.connect(mongoUrl);
+  await mongoose.connect(dburl);
 }
 
 //session
@@ -108,12 +116,19 @@ app.get("/user", async (req, res) => {
   if (req.user) {
     req.user.markModified("trackingArray");
     await req.user.save();
-    const updatedUser = await User.findById(req.user._id).populate(
-      "trackingArray"
-    );
+    const updatedUser = await User.findById(req.user._id)
+      .populate("trackingArray")
+      .populate({
+        path: "paymentArray",
+        populate: {
+          path: "trackingid",
+          model: "PrimaryTracking",
+        },
+      });
     res.json({
       username: updatedUser.username,
       trackingArray: updatedUser.trackingArray,
+      paymentArray: updatedUser.paymentArray,
     });
   } else {
     res.status(401).json({ message: "Not authenticated" });
