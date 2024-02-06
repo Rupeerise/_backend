@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:5173", // or the specific origin you want to allow
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     exposedHeaders: ["Set-Cookie"],
@@ -96,7 +96,6 @@ app.post("/signup", async (req, res) => {
 //login
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  console.log("req.user");
   res.json({ user: req.user.username });
 });
 
@@ -181,6 +180,33 @@ app.post("/addpayment", async (req, res) => {
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }
+});
+
+//deletepayment
+app.delete("/deletepayment/:id", async (req, res) => {
+  const paymentId = req.params.id;
+  const updatePayment = await Payment.findById(paymentId);
+  const trackingid = updatePayment.trackingid;
+  const updateTracking = await primaryTracking.findById(trackingid);
+  updateTracking.current = updateTracking.current - updatePayment.amount;
+  await updateTracking.save();
+  await Payment.findByIdAndDelete(paymentId);
+  // Remove the payment from user's paymentArray
+  await User.findByIdAndUpdate(req.user._id, {
+    $pull: { paymentArray: paymentId },
+  });
+  res.json({ message: "Payment deleted successfully" });
+});
+
+//update tracking
+app.put("/tracking/:id", async (req, res) => {
+  let id = req.params.id;
+  let { name, target } = req.body;
+  let update = await primaryTracking.findById(id);
+  update.name = name;
+  update.target = target;
+  await update.save();
+  res.json({ message: "Tracking updated successfully" });
 });
 
 app.listen(8080, () => {
