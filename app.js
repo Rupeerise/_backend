@@ -138,7 +138,12 @@ app.get("/user", async (req, res) => {
 app.post("/addtracking", async (req, res) => {
   if (req.user) {
     let { name, target } = req.body;
-    let newTracking = new primaryTracking({ name, target, current: 0 });
+    let newTracking = new primaryTracking({
+      name,
+      target,
+      current: 0,
+      secondaryTracking: [{ name: "other", target, current: 0 }],
+    });
     await newTracking.save();
 
     req.user.trackingArray.push(newTracking);
