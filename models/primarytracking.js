@@ -11,6 +11,11 @@ const primaryTracking = new Schema({
   name: String,
   target: Number,
   current: Number,
+  trackingType: {
+    type: String,
+    enum: ["income", "variable expense", "constant expense"],
+    required: true,
+  },
   secondaryTracking: [secondaryTrackingSchema],
 });
 
