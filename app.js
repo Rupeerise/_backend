@@ -8,6 +8,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const trackingRouter = require("./routers/tracking");
 const paymentRouter = require("./routers/payment");
+const appRouter = require("./routers/api");
 
 const app = express();
 require("dotenv").config();
@@ -77,62 +78,8 @@ app.get("/", (req, res) => {
   res.send("Hello this is root");
 });
 
-//signup
-app.post("/signup", async (req, res) => {
-  let { username, fullname, password } = req.body;
-  let newUser = new User({ username, fullname });
-  const registeredUser = await User.register(newUser, password);
-
-  req.login(registeredUser, (err) => {
-    if (err) {
-      console.log(err);
-      res.status(500).json({ message: "Error logging in user" });
-    } else {
-      res.json({ message: "User created and logged in successfully" });
-    }
-  });
-});
-
-//login
-app.post("/login", passport.authenticate("local"), (req, res) => {
-  res.json({ user: req.user.username });
-});
-
-//logout
-app.post("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      next(err);
-    } else {
-      res.json({ message: "User logged out successfully" });
-    }
-  });
-});
-
-//user
-app.get("/user", async (req, res) => {
-  if (req.user) {
-    req.user.markModified("trackingArray");
-    await req.user.save();
-    const updatedUser = await User.findById(req.user._id)
-      .populate("trackingArray")
-      .populate({
-        path: "paymentArray",
-        populate: {
-          path: "trackingid",
-          model: "PrimaryTracking",
-        },
-      });
-    res.json({
-      username: updatedUser.username,
-      trackingArray: updatedUser.trackingArray,
-      paymentArray: updatedUser.paymentArray,
-    });
-  } else {
-    res.status(401).json({ message: "Not authenticated" });
-  }
-});
-
+//api
+app.use("/api", appRouter);
 //tracking
 app.use("/tracking", trackingRouter);
 //payment
