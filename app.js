@@ -15,7 +15,7 @@ require("dotenv").config();
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:5173", // or the specific origin you want to allow
+    origin: ["http://localhost:5173", "http://localhost:8081"],
     methods: ["GET", "POST", "DELETE", "PUT"],
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -86,5 +86,5 @@ app.use("/tracking", trackingRouter);
 app.use("/payment", paymentRouter);
 
 app.listen(8080, () => {
-  console.log("Server is listening");
+  console.log("Server is listening at 8080");
 });
