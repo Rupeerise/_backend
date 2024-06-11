@@ -3,7 +3,7 @@ const router = express.Router();
 const { addTag, updateTag, getTagArray } = require("../controllers/tag");
 
 // Add tracking
-router.post("/add", addTag);
+router.post("/", addTag);
 
 // Update tracking
 router.put("/:id", updateTag);

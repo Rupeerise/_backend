@@ -38,20 +38,20 @@ router.post("/logout", (req, res, next) => {
 //user
 router.get("/user", async (req, res) => {
   if (req.user) {
-    req.user.markModified("trackingArray");
+    req.user.markModified("tagArray");
     await req.user.save();
     const updatedUser = await User.findById(req.user._id)
-      .populate("trackingArray")
+      .populate("tagArray")
       .populate({
         path: "paymentArray",
         populate: {
-          path: "trackingid",
-          model: "PrimaryTracking",
+          path: "tagid",
+          model: "Tag",
         },
       });
     res.json({
       username: updatedUser.username,
-      trackingArray: updatedUser.trackingArray,
+      tagArray: updatedUser.tagArray,
       paymentArray: updatedUser.paymentArray,
     });
   } else {

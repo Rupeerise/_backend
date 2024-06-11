@@ -6,7 +6,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const trackingRouter = require("./routers/tag");
+const tagRouter = require("./routers/tag");
 const paymentRouter = require("./routers/payment");
 const appRouter = require("./routers/api");
 
@@ -65,14 +65,6 @@ passport.deserializeUser(async function (id, done) {
   }
 });
 
-//demouser
-// app.get("/demouser", (req, res) => {
-//   let fakeUser = new User({ username: "demo", fullname: "Demo User" });
-//   User.register(fakeUser, "demo");
-//   console.log(fakeUser);
-//   res.send("Hello this is demouser");
-// });
-
 //roots
 app.get("/", (req, res) => {
   res.send("Hello this is root");
@@ -81,7 +73,7 @@ app.get("/", (req, res) => {
 //api
 app.use("/api", appRouter);
 //tracking
-app.use("/tracking", trackingRouter);
+app.use("/tag", tagRouter);
 //payment
 app.use("/payment", paymentRouter);
 

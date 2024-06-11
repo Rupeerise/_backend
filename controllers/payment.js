@@ -1,5 +1,5 @@
 const Payment = require("../models/payment");
-const primaryTracking = require("../models/tag");
+const Tag = require("../models/tag");
 const User = require("../models/user");
 
 const addPayment = async (req, res) => {
@@ -7,24 +7,22 @@ const addPayment = async (req, res) => {
     let { name, amount, date } = req.body;
 
     // Populate the trackingArray
-    await req.user.populate("trackingArray");
+    await req.user.populate("tagArray");
 
-    let trackingid = req.user.trackingArray.find(
-      (tracking) => tracking.name === name
-    );
+    let tagid = req.user.tagArray.find((tag) => tag.name === name);
 
-    if (trackingid) {
-      trackingid.current = Number(trackingid.current) + Number(amount);
-      await trackingid.save();
+    if (tagid) {
+      tagid.current = Number(tagid.current) + Number(amount);
+      await tagid.save();
       let newPayment = new Payment({
-        trackingid: trackingid._id,
+        tagid: tagid._id,
         amount,
         date,
       });
       await newPayment.save();
       req.user.paymentArray.push(newPayment);
       await req.user.save();
-      await newPayment.populate("trackingid");
+      await newPayment.populate("tagid");
       res.json({ newPayment });
     } else {
       res.status(404).json({ message: "Tracking not found" });
@@ -37,10 +35,10 @@ const addPayment = async (req, res) => {
 const deletePayment = async (req, res) => {
   const paymentId = req.params.id;
   const updatePayment = await Payment.findById(paymentId);
-  const trackingid = updatePayment.trackingid;
-  const updateTracking = await primaryTracking.findById(trackingid);
-  updateTracking.current = updateTracking.current - updatePayment.amount;
-  await updateTracking.save();
+  const tagid = updatePayment.tagid;
+  const updateTag = await Tag.findById(tagid);
+  updateTag.current = updateTag.current - updatePayment.amount;
+  await updateTag.save();
   await Payment.findByIdAndDelete(paymentId);
   // Remove the payment from user's paymentArray
   await User.findByIdAndUpdate(req.user._id, {
@@ -54,8 +52,8 @@ const getPaymentArray = async (req, res) => {
     await req.user.populate({
       path: "paymentArray",
       populate: {
-        path: "trackingid",
-        model: "PrimaryTracking",
+        path: "tagid",
+        model: "Tag",
       },
     });
     res.json(req.user.paymentArray);

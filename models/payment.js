@@ -1,11 +1,10 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const primaryTracking = require("./tag");
 
 const paymentSchema = new Schema({
   trackingid: {
     type: Schema.Types.ObjectId,
-    ref: "PrimaryTracking",
+    ref: "Tag",
     required: true,
   },
   amount: {
