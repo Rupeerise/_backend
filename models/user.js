@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const passportLocalMongoose = require("passport-local-mongoose");
-const primaryTracking = require("./primarytracking");
+const primaryTracking = require("./tag");
 const payment = require("./payment");
 
 const userSchema = new Schema({

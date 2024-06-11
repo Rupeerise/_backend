@@ -1,6 +1,6 @@
-const primaryTracking = require("../models/primarytracking");
+const primaryTracking = require("../models/tag");
 
-const addTracking = async (req, res) => {
+const addTag = async (req, res) => {
   if (req.user) {
     let { name, target, trackingType } = req.body;
     let newTracking = new primaryTracking({
@@ -19,7 +19,7 @@ const addTracking = async (req, res) => {
   }
 };
 
-const updateTracking = async (req, res) => {
+const updateTag = async (req, res) => {
   if (req.user) {
     let id = req.params.id;
     let { name, target } = req.body;
@@ -34,7 +34,7 @@ const updateTracking = async (req, res) => {
   }
 };
 
-const getTrackingArray = async (req, res) => {
+const getTagArray = async (req, res) => {
   if (req.user) {
     await req.user.populate("trackingArray");
     res.json(req.user.trackingArray);
@@ -44,7 +44,7 @@ const getTrackingArray = async (req, res) => {
 };
 
 module.exports = {
-  addTracking,
-  updateTracking,
-  getTrackingArray,
+  addTag,
+  updateTag,
+  getTagArray,
 };

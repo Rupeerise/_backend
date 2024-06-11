@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const primaryTracking = new Schema({
+const tag = new Schema({
   name: String,
   target: Number,
   current: Number,
@@ -12,5 +12,5 @@ const primaryTracking = new Schema({
   },
 });
 
-const PrimaryTracking = mongoose.model("PrimaryTracking", primaryTracking);
-module.exports = PrimaryTracking;
+const Tag = mongoose.model("Tag", tag);
+module.exports = tag;

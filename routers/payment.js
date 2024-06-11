@@ -6,7 +6,7 @@ const {
   getPaymentArray,
 } = require("../controllers/payment");
 
-router.post("/add", addPayment);
+router.post("/", addPayment);
 
 router.delete("/:id", deletePayment);
 

@@ -1,5 +1,5 @@
 const Payment = require("../models/payment");
-const primaryTracking = require("../models/primarytracking");
+const primaryTracking = require("../models/tag");
 const User = require("../models/user");
 
 const addPayment = async (req, res) => {
@@ -24,7 +24,8 @@ const addPayment = async (req, res) => {
       await newPayment.save();
       req.user.paymentArray.push(newPayment);
       await req.user.save();
-      res.json({ message: "Payment added successfully", id: newPayment._id });
+      await newPayment.populate("trackingid");
+      res.json({ newPayment });
     } else {
       res.status(404).json({ message: "Tracking not found" });
     }
@@ -50,7 +51,13 @@ const deletePayment = async (req, res) => {
 
 const getPaymentArray = async (req, res) => {
   if (req.user) {
-    await req.user.populate("paymentArray");
+    await req.user.populate({
+      path: "paymentArray",
+      populate: {
+        path: "trackingid",
+        model: "PrimaryTracking",
+      },
+    });
     res.json(req.user.paymentArray);
   } else {
     res.status(401).json({ message: "Not authenticated" });

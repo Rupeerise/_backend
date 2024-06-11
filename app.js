@@ -6,7 +6,7 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const trackingRouter = require("./routers/tracking");
+const trackingRouter = require("./routers/tag");
 const paymentRouter = require("./routers/payment");
 const appRouter = require("./routers/api");
 
