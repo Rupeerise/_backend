@@ -34,7 +34,17 @@ const updateTracking = async (req, res) => {
   }
 };
 
+const getTrackingArray = async (req, res) => {
+  if (req.user) {
+    await req.user.populate("trackingArray");
+    res.json(req.user.trackingArray);
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
 module.exports = {
   addTracking,
   updateTracking,
+  getTrackingArray,
 };

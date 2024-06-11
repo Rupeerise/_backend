@@ -24,7 +24,7 @@ const addPayment = async (req, res) => {
       await newPayment.save();
       req.user.paymentArray.push(newPayment);
       await req.user.save();
-      res.json({ message: "Payment added successfully" });
+      res.json({ message: "Payment added successfully", id: newPayment._id });
     } else {
       res.status(404).json({ message: "Tracking not found" });
     }
@@ -48,4 +48,13 @@ const deletePayment = async (req, res) => {
   res.json({ message: "Payment deleted successfully" });
 };
 
-module.exports = { addPayment, deletePayment };
+const getPaymentArray = async (req, res) => {
+  if (req.user) {
+    await req.user.populate("paymentArray");
+    res.json(req.user.paymentArray);
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
+module.exports = { addPayment, deletePayment, getPaymentArray };
