@@ -5,7 +5,7 @@ const User = require("../models/user");
 const addPayment = async (req, res) => {
   if (req.user) {
     let { name, amount, date } = req.body;
-
+    if (!date) date = new Date();
     // Populate the trackingArray
     await req.user.populate("tagArray");
 
@@ -45,6 +45,22 @@ const deletePayment = async (req, res) => {
     $pull: { paymentArray: paymentId },
   });
   res.json({ message: "Payment deleted successfully" });
+};
+
+const updatePayment = async (req, res) => {
+  if (!req.user) return res.status(401).json({ message: "Not authenticated" });
+  const paymentId = req.params.id;
+  const { amount, date } = req.body;
+  const updatePayment = await Payment.findById(paymentId);
+  const tagid = updatePayment.tagid;
+  const updateTag = await Tag.findById(tagid);
+  updateTag.current = updateTag.current - updatePayment.amount;
+  updatePayment.amount = amount;
+  updatePayment.date = date;
+  updateTag.current = updateTag.current + amount;
+  await updatePayment.save();
+  await updateTag.save();
+  res.json({ message: "Payment updated successfully" });
 };
 
 const getPaymentArray = async (req, res) => {

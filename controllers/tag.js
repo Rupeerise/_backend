@@ -25,7 +25,7 @@ const updateTag = async (req, res) => {
     let { name, target } = req.body;
     console.log(id);
     //finding from user's trackingArray
-    let update = await Tag.findOne({ _id: id, user: req.user._id }).exec();
+    let update = await Tag.findOne({ _id: id });
     console.log(update);
     if (!update) return res.status(404).json({ message: "Tag not found" });
 
@@ -47,8 +47,23 @@ const getTagArray = async (req, res) => {
   }
 };
 
+const deleteTag = async (req, res) => {
+  if (req.user) {
+    let id = req.params.id;
+    let tag = await Tag.findOne({ _id: id });
+    if (!tag) return res.status(404).json({ message: "Tag not found" });
+    await tag.deleteOne();
+    // remove tag from user's tagArray
+    req.user.tagArray = req.user.tagArray.filter((t) => t._id != id);
+    res.json({ message: "Tag deleted successfully" });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
 module.exports = {
   addTag,
   updateTag,
   getTagArray,
+  deleteTag,
 };

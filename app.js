@@ -77,6 +77,17 @@ app.use("/tag", tagRouter);
 //payment
 app.use("/payment", paymentRouter);
 
+//not found
+app.use((req, res, next) => {
+  res.status(404).json({ message: "Not found" });
+});
+
+//error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something broke!");
+});
+
 app.listen(8080, () => {
   console.log("Server is listening at 8080");
 });
