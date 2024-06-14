@@ -23,7 +23,6 @@ const updateTracking = async (req, res) => {
   if (req.user) {
     let id = req.params.id;
     let { name, target } = req.body;
-    //finding from user's trackingArray
     let update = await primaryTracking.findOne({ _id: id, user: req.user._id });
     update.name = name;
     update.target = target;
