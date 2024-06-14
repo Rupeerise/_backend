@@ -2,11 +2,11 @@ const Tag = require("../models/tag");
 
 const addTag = async (req, res) => {
   if (req.user) {
-    let { name, target, trackingType } = req.body;
-    let newTag = new primaryTracking({
+    let { name, target, tagType } = req.body;
+    let newTag = new Tag({
       name,
       target,
-      trackingType,
+      tagType,
       current: 0,
     });
     await newTag.save();
@@ -23,9 +23,10 @@ const updateTag = async (req, res) => {
   if (req.user) {
     let id = req.params.id;
     let { name, target } = req.body;
+    console.log(id);
     //finding from user's trackingArray
-    let update = await Tag.findOne({ _id: id, user: req.user._id });
-
+    let update = await Tag.findOne({ _id: id, user: req.user._id }).exec();
+    console.log(update);
     if (!update) return res.status(404).json({ message: "Tag not found" });
 
     update.name = name;

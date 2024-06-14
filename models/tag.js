@@ -5,7 +5,7 @@ const tag = new Schema({
   name: String,
   target: Number,
   current: Number,
-  trackingType: {
+  tagType: {
     type: String,
     enum: ["income", "variable expense", "emi", "loan repayment", "investment"],
     required: true,
