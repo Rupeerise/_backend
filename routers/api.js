@@ -38,21 +38,18 @@ router.post("/logout", (req, res, next) => {
 //user
 router.get("/user", async (req, res) => {
   if (req.user) {
-    req.user.markModified("tagArray");
-    await req.user.save();
-    const updatedUser = await User.findById(req.user._id)
-      .populate("tagArray")
-      .populate({
-        path: "paymentArray",
-        populate: {
-          path: "tagid",
-          model: "Tag",
-        },
-      });
     res.json({
-      username: updatedUser.username,
-      tagArray: updatedUser.tagArray,
-      paymentArray: updatedUser.paymentArray,
+      username: req.user.username,
+    });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
+router.put("/authenticate", async (req, res) => {
+  if (req.user) {
+    res.json({
+      username: req.user.username,
     });
   } else {
     res.status(401).json({ message: "Not authenticated" });

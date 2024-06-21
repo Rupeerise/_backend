@@ -4,12 +4,11 @@ const User = require("../models/user");
 
 const addPayment = async (req, res) => {
   if (req.user) {
-    let { name, amount, date } = req.body;
+    let { _id, amount, date } = req.body;
     if (!date) date = new Date();
     // Populate the trackingArray
     await req.user.populate("tagArray");
-
-    let tagid = req.user.tagArray.find((tag) => tag.name === name);
+    let tagid = req.user.tagArray.find((tag) => tag._id.equals(_id));
 
     if (tagid) {
       tagid.current = Number(tagid.current) + Number(amount);
@@ -78,4 +77,4 @@ const getPaymentArray = async (req, res) => {
   }
 };
 
-module.exports = { addPayment, deletePayment, getPaymentArray };
+module.exports = { addPayment, deletePayment, getPaymentArray, updatePayment };

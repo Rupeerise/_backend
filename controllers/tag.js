@@ -13,7 +13,7 @@ const addTag = async (req, res) => {
     req.user.tagArray.push(newTag);
     await req.user.save();
 
-    res.json({ message: "Tracking added successfully" });
+    res.json({ newTag });
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }
