@@ -5,8 +5,8 @@ const router = express.Router();
 
 //signup
 router.post("/signup", async (req, res) => {
-  let { username, fullname, password } = req.body;
-  let newUser = new User({ username, fullname });
+  let { username, fullname, password, currency } = req.body;
+  let newUser = new User({ username, fullname, currency });
   const registeredUser = await User.register(newUser, password);
 
   req.login(registeredUser, (err) => {
@@ -53,6 +53,26 @@ router.put("/authenticate", async (req, res) => {
     });
   } else {
     res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
+router.get("/currency", async (req, res) => {
+  if (req.user) {
+    res.json({
+      currency: req.user.currency,
+    });
+  } else {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+});
+
+router.put("/currency", async (req, res) => {
+  if (req.user) {
+    let { currency } = req.body;
+    await User.findByIdAndUpdate(req.user._id, { currency });
+    res.json({
+      currency,
+    });
   }
 });
 
