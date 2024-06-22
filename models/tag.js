@@ -3,8 +3,13 @@ const Schema = mongoose.Schema;
 
 const tag = new Schema({
   name: String,
-  target: Number,
-  current: Number,
+  target: [
+    {
+      month: Number,
+      year: Number,
+      amount: Number,
+    },
+  ],
   tagType: {
     type: String,
     enum: ["income", "variable expense", "emi", "loan repayment", "investment"],
