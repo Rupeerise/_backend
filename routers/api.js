@@ -5,8 +5,8 @@ const router = express.Router();
 
 //signup
 router.post("/signup", async (req, res) => {
-  let { username, fullname, password, currency } = req.body;
-  let newUser = new User({ username, fullname, currency });
+  let { username, password, currency } = req.body;
+  let newUser = new User({ username, currency });
   const registeredUser = await User.register(newUser, password);
 
   req.login(registeredUser, (err) => {

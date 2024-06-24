@@ -9,6 +9,7 @@ const cookieParser = require("cookie-parser");
 const tagRouter = require("./routers/tag");
 const paymentRouter = require("./routers/payment");
 const appRouter = require("./routers/api");
+const targetRouter = require("./routers/target");
 
 const app = express();
 require("dotenv").config();
@@ -76,6 +77,8 @@ app.use("/api", appRouter);
 app.use("/tag", tagRouter);
 //payment
 app.use("/payment", paymentRouter);
+//target
+app.use("/target", targetRouter);
 
 //not found
 app.use((req, res, next) => {

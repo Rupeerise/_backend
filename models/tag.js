@@ -3,11 +3,10 @@ const Schema = mongoose.Schema;
 
 const tag = new Schema({
   name: String,
-  target: [
+  targets: [
     {
-      month: Number,
-      year: Number,
-      amount: Number,
+      type: Schema.Types.ObjectId,
+      ref: "Target",
     },
   ],
   tagType: {
