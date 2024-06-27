@@ -14,6 +14,10 @@ const targetSchema = new Schema({
     type: Number,
     required: true,
   },
+  tagid: {
+    type: Schema.Types.ObjectId,
+    ref: "Tag",
+  },
 });
 
 module.exports = mongoose.model("Target", targetSchema);

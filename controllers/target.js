@@ -3,14 +3,15 @@ const Tag = require("../models/tag");
 
 const addTarget = async (req, res) => {
   if (req.user) {
-    const { amount, month, year, _id } = req.body;
+    const { amount, month, year, tagid } = req.body;
     let newTarget = new Target({
       amount,
       month,
       year,
+      tagid,
     });
     await newTarget.save();
-    const tag = await Tag.findById(_id);
+    const tag = await Tag.findById(tagid);
     await tag.populate("targets");
     const targets = tag.targets;
     for (const target of targets) {
@@ -32,14 +33,14 @@ const addTarget = async (req, res) => {
 const updateTarget = async (req, res) => {
   if (req.user) {
     const { amount, month, year, _id } = req.body;
-    console.log(_id);
-    const update = await Target.findById(_id); // This is giving always null
-    if (!update) return res.status(404).json({ message: "Target not found" });
-    update.amount = amount;
-    update.month = month;
-    update.year = year;
-    await update.save();
-    res.json({ message: "Target updated successfully" });
+    const newTarget = await Target.findById(_id);
+    if (!newTarget)
+      return res.status(404).json({ message: "Target not found" });
+    newTarget.amount = amount;
+    newTarget.month = month;
+    newTarget.year = year;
+    await newTarget.save();
+    res.json({ updateTarget: newTarget });
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }

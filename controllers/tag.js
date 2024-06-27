@@ -1,4 +1,5 @@
 const Tag = require("../models/tag");
+const Target = require("../models/target");
 
 const addTag = async (req, res) => {
   if (req.user) {
@@ -11,15 +12,18 @@ const addTag = async (req, res) => {
 
     let newTag = new Tag({
       name,
-      target: [
-        {
-          month: month,
-          year: year,
-          amount: target,
-        },
-      ],
+      targets: [],
       tagType,
     });
+    await newTag.save();
+    const newTarget = new Target({
+      amount: target,
+      month,
+      year,
+      tagid: newTag._id,
+    });
+    await newTarget.save();
+    newTag.targets.push(newTarget); //this is not working
     await newTag.save();
     req.user.tagArray.push(newTag);
     await req.user.save();
@@ -58,7 +62,6 @@ const getTagArray = async (req, res) => {
         model: "Target", // Model name of the documents you're populating
       },
     });
-
     res.json(req.user.tagArray);
   } else {
     res.status(401).json({ message: "Not authenticated" });
