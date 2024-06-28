@@ -87,8 +87,8 @@ app.use((req, res, next) => {
 
 //error handling
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Something broke!");
+  const { status = 500, message = "Something went wrong" } = err;
+  res.status(status).json({ message });
 });
 
 app.listen(8080, () => {

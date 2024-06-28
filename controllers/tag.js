@@ -1,10 +1,15 @@
 const Tag = require("../models/tag");
 const Target = require("../models/target");
+const tagSchema = require("../schema/tag");
+const targetSchema = require("../schema/target");
 
 const addTag = async (req, res) => {
   if (req.user) {
     let { name, target, tagType } = req.body;
-
+    const { error } = tagSchema.validate({ name, tagType, targets: [] });
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
     const date = new Date();
 
     const month = date.getMonth();
@@ -16,6 +21,15 @@ const addTag = async (req, res) => {
       tagType,
     });
     await newTag.save();
+    const { error: targetError } = targetSchema.validate({
+      amount: target,
+      month,
+      year,
+      tagid: newTag._id,
+    });
+    if (targetError) {
+      return res.status(400).json({ message: targetError.message });
+    }
     const newTarget = new Target({
       amount: target,
       month,
@@ -77,33 +91,6 @@ const deleteTag = async (req, res) => {
     // remove tag from user's tagArray
     req.user.tagArray = req.user.tagArray.filter((t) => t._id != id);
     res.json({ message: "Tag deleted successfully" });
-  } else {
-    res.status(401).json({ message: "Not authenticated" });
-  }
-};
-
-const updateTarget = async (req, res) => {
-  if (req.user) {
-    let id = req.params.id;
-    let { target, date } = req.body;
-    let tag = await Tag.findOne({ _id: id });
-    if (!tag) return res.status(404).json({ message: "Tag not found" });
-    const month = date.getMonth();
-    const year = date.getFullYear();
-    let targetIndex = tag.target.findIndex(
-      (t) => t.month == month && t.year == year
-    );
-    if (targetIndex == -1) {
-      tag.target.push({
-        month: month,
-        year: year,
-        amount: target,
-      });
-    } else {
-      tag.target[targetIndex].amount = target;
-    }
-    await tag.save();
-    res.json({ message: "Target updated successfully" });
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }

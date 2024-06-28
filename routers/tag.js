@@ -6,16 +6,17 @@ const {
   getTagArray,
   deleteTag,
 } = require("../controllers/tag");
+const wrapasync = require("../utilities/utilities");
 
 // Add tracking
-router.post("/", addTag);
+router.post("/", wrapasync(addTag));
 
 // Update tracking
-router.put("/:id", updateTag);
+router.put("/:id", wrapasync(updateTag));
 
 //get tracking array
-router.get("/", getTagArray);
+router.get("/", wrapasync(getTagArray));
 
-router.delete("/:id", deleteTag);
+router.delete("/:id", wrapasync(deleteTag));
 
 module.exports = router;

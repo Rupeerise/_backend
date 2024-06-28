@@ -6,13 +6,18 @@ const {
   getPaymentArray,
   updatePayment,
 } = require("../controllers/payment");
+const wrapasync = require("../utilities/utilities");
 
-router.post("/", addPayment);
+// Add payment
+router.post("/", wrapasync(addPayment));
 
-router.delete("/:id", deletePayment);
+// Delete payment
+router.delete("/:id", wrapasync(deletePayment));
 
-router.get("/", getPaymentArray);
+// Get payment array
+router.get("/", wrapasync(getPaymentArray));
 
-router.put("/:id", updatePayment);
+// Update payment
+router.put("/:id", wrapasync(updatePayment));
 
 module.exports = router;

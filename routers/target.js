@@ -5,14 +5,15 @@ const {
   updateTarget,
   deleteTarget,
 } = require("../controllers/target");
+const wrapasync = require("../utilities/utilities");
 
 // Add target
-router.post("/", addTarget);
+router.post("/", wrapasync(addTarget));
 
 // Update target
-router.put("/", updateTarget);
+router.put("/", wrapasync(updateTarget));
 
 // Delete target
-router.delete("/:id", deleteTarget);
+router.delete("/:id", wrapasync(deleteTarget));
 
 module.exports = router;

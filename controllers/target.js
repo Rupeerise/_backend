@@ -1,9 +1,14 @@
 const Target = require("../models/target");
 const Tag = require("../models/tag");
+const targetSchema = require("../schema/target");
 
 const addTarget = async (req, res) => {
   if (req.user) {
     const { amount, month, year, tagid } = req.body;
+    const { error } = targetSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
     let newTarget = new Target({
       amount,
       month,
@@ -21,7 +26,6 @@ const addTarget = async (req, res) => {
         });
       }
     }
-
     tag.targets.push(newTarget);
     await tag.save();
     res.json({ newTarget });
@@ -39,6 +43,10 @@ const updateTarget = async (req, res) => {
     newTarget.amount = amount;
     newTarget.month = month;
     newTarget.year = year;
+    const { error } = targetSchema.validate(newTarget);
+    if (error) {
+      return res.status(400).json({ message: error.message });
+    }
     await newTarget.save();
     res.json({ updateTarget: newTarget });
   } else {
