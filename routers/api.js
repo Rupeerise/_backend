@@ -8,6 +8,7 @@ const {
   user,
   authenticate,
   currency,
+  updateCurrency,
 } = require("../controllers/api");
 const wrapasync = require("../utilities/utilities");
 
@@ -20,7 +21,7 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 });
 
 //logout
-router.post("/logout", wrapasync(logout));
+router.post("/logout", logout);
 
 //user
 router.get("/user", wrapasync(user));
@@ -29,6 +30,6 @@ router.put("/authenticate", wrapasync(authenticate));
 
 router.get("/currency", wrapasync(currency));
 
-router.put("/currency", wrapasync(currency));
+router.put("/currency", wrapasync(updateCurrency));
 
 module.exports = router;

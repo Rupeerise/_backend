@@ -15,6 +15,15 @@ const paymentSchema = new Schema({
     type: Date,
     required: true,
   },
+  paymentType: {
+    type: String,
+    enum: ["credit", "debit"],
+    required: true,
+  },
+  isDone: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Payment = mongoose.model("Payment", paymentSchema);

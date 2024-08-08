@@ -43,10 +43,11 @@ const updateTarget = async (req, res) => {
     newTarget.amount = amount;
     newTarget.month = month;
     newTarget.year = year;
-    const { error } = targetSchema.validate(newTarget);
-    if (error) {
-      return res.status(400).json({ message: error.message });
-    }
+    // const { error } = targetSchema.validate(newTarget);
+    // console.log(error.message);
+    // if (error) {
+    //   return res.status(400).json({ message: error.message });
+    // }
     await newTarget.save();
     res.json({ updateTarget: newTarget });
   } else {

@@ -5,8 +5,13 @@ const targetSchema = require("../schema/target");
 
 const addTag = async (req, res) => {
   if (req.user) {
-    let { name, target, tagType } = req.body;
-    const { error } = tagSchema.validate({ name, tagType, targets: [] });
+    let { name, target, tagType, timePeriod } = req.body;
+    const { error } = tagSchema.validate({
+      name,
+      tagType,
+      targets: [],
+      timePeriod,
+    });
     if (error) {
       return res.status(400).json({ message: error.message });
     }
@@ -19,13 +24,16 @@ const addTag = async (req, res) => {
       name,
       targets: [],
       tagType,
+      timePeriod,
     });
     await newTag.save();
+    const plsvalidate = newTag._id;
+    const tagidforTarget = plsvalidate.toString();
     const { error: targetError } = targetSchema.validate({
       amount: target,
       month,
       year,
-      tagid: newTag._id,
+      tagid: tagidforTarget,
     });
     if (targetError) {
       return res.status(400).json({ message: targetError.message });
@@ -37,7 +45,7 @@ const addTag = async (req, res) => {
       tagid: newTag._id,
     });
     await newTarget.save();
-    newTag.targets.push(newTarget); //this is not working
+    newTag.targets.push(newTarget);
     await newTag.save();
     req.user.tagArray.push(newTag);
     await req.user.save();
@@ -51,16 +59,17 @@ const addTag = async (req, res) => {
 const updateTag = async (req, res) => {
   if (req.user) {
     let id = req.params.id;
-    let { name, tagType } = req.body;
+    let { name, tagType, timePeriod } = req.body;
     //finding from user's trackingArray
     let update = await Tag.findOne({ _id: id });
-    if (!update) return res.status(404).json({ message: "Tag not found" });
+    if (!update) return res.status().json({ message: "Tag not found" });
 
     update.name = name;
     update.tagType = tagType;
+    update.timePeriod = timePeriod;
 
     await update.save();
-    res.json({ message: "Tag updated successfully" });
+    res.json({ updateTag: update });
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }
