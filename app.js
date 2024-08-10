@@ -10,6 +10,7 @@ const tagRouter = require("./routers/tag");
 const paymentRouter = require("./routers/payment");
 const appRouter = require("./routers/api");
 const targetRouter = require("./routers/target");
+const loanRouter = require("./routers/loan");
 
 const app = express();
 require("dotenv").config();
@@ -79,6 +80,8 @@ app.use("/tag", tagRouter);
 app.use("/payment", paymentRouter);
 //target
 app.use("/target", targetRouter);
+//loan
+app.use("/loan", loanRouter);
 
 //not found
 app.use((req, res, next) => {

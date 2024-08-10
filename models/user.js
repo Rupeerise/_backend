@@ -15,6 +15,12 @@ const userSchema = new Schema({
       ref: "Payment",
     },
   ],
+  loanArray: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "Loan",
+    },
+  ],
   currency: {
     type: String,
     // required: true,
