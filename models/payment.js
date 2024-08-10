@@ -5,7 +5,10 @@ const paymentSchema = new Schema({
   tagid: {
     type: Schema.Types.ObjectId,
     ref: "Tag",
-    required: true,
+  },
+  loanid: {
+    type: Schema.Types.ObjectId,
+    ref: "Loan",
   },
   amount: {
     type: Number,
@@ -25,6 +28,15 @@ const paymentSchema = new Schema({
     default: false,
   },
 });
+
+// Custom validation to ensure either tagid or loanid is present
+paymentSchema.path("tagid").validate(function (value) {
+  return this.tagid || this.loanid;
+}, "Either tagid or loanid must be present.");
+
+paymentSchema.path("loanid").validate(function (value) {
+  return this.tagid || this.loanid;
+}, "Either tagid or loanid must be present.");
 
 const Payment = mongoose.model("Payment", paymentSchema);
 module.exports = Payment;

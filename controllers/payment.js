@@ -6,11 +6,12 @@ const paymentSchema = require("../schema/payment");
 
 const addPayment = async (req, res) => {
   if (req.user) {
-    let { _id, amount, date, paymentType, isDone } = req.body;
+    let { tagid, loanid, amount, date, paymentType, isDone } = req.body;
     if (!date) date = new Date();
     // Populate the trackingArray
     const { error } = paymentSchema.validate({
-      tagid: _id,
+      tagid,
+      loanid,
       amount,
       date,
       paymentType,
@@ -21,7 +22,8 @@ const addPayment = async (req, res) => {
     }
     await req.user.populate("tagArray");
     let newPayment = new Payment({
-      tagid: _id,
+      tagid,
+      loanid,
       amount,
       date,
       paymentType,
@@ -31,6 +33,7 @@ const addPayment = async (req, res) => {
     req.user.paymentArray.push(newPayment);
     await req.user.save();
     await newPayment.populate("tagid");
+    await newPayment.populate("loanid");
     res.json({ newPayment });
   } else {
     res.status(401).json({ message: "Not authenticated" });
@@ -39,8 +42,6 @@ const addPayment = async (req, res) => {
 
 const deletePayment = async (req, res) => {
   const paymentId = req.params.id;
-  const updatePayment = await Payment.findById(paymentId);
-  const tagid = updatePayment.tagid;
   await Payment.findByIdAndDelete(paymentId);
   await User.findByIdAndUpdate(req.user._id, {
     $pull: { paymentArray: paymentId },
@@ -51,13 +52,22 @@ const deletePayment = async (req, res) => {
 const updatePayment = async (req, res) => {
   if (!req.user) return res.status(401).json({ message: "Not authenticated" });
   const paymentId = req.params.id;
-  let { amount, date, isDone, paymentType, tagid } = req.body;
+  let { amount, date, isDone, paymentType, tagid, loanid } = req.body;
   if (!date) date = new Date();
   if (!isDone) isDone = true;
   const updatePayment = await Payment.findById(paymentId);
 
+  // Update the payment
+  updatePayment.amount = amount;
+  updatePayment.date = date;
+  updatePayment.isDone = isDone;
+  updatePayment.paymentType = paymentType;
+  updatePayment.tagid = tagid;
+  updatePayment.loanid = loanid;
+
   const { error } = paymentSchema.validate({
-    tagid: "tag id ",
+    tagid,
+    loanid,
     amount,
     date,
     paymentType,
@@ -66,16 +76,9 @@ const updatePayment = async (req, res) => {
   if (error) {
     return res.status(400).json({ message: error.message });
   }
-
-  // Update the payment
-  updatePayment.amount = amount;
-  updatePayment.date = date;
-  updatePayment.isDone = isDone;
-  updatePayment.paymentType = paymentType;
-  updatePayment.tagid = tagid;
-
   await updatePayment.save();
   await updatePayment.populate("tagid");
+  await updatePayment.populate("loanid");
   res.json({ updatePayment });
 };
 
@@ -83,11 +86,21 @@ const getPaymentArray = async (req, res) => {
   if (req.user) {
     await req.user.populate({
       path: "paymentArray",
-      populate: {
-        path: "tagid",
-        model: "Tag",
-      },
+      populate: [
+        {
+          path: "tagid",
+          model: "Tag",
+        },
+        {
+          path: "loanid",
+          model: "Loan",
+        },
+      ],
     });
+
+    // Populate the tagArray
+    await req.user.populate("tagArray");
+
     res.json(req.user.paymentArray);
   } else {
     res.status(401).json({ message: "Not authenticated" });

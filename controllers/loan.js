@@ -2,6 +2,7 @@ const Loan = require("../models/loan");
 const loanSchema = require("../schema/loan");
 
 const addLoan = async (req, res) => {
+  // console.log(req.user);
   if (req.user) {
     let { name, amount, interestRate, timePeriod, tagType } = req.body;
     const { error } = loanSchema.validate({
