@@ -1,5 +1,7 @@
 const Loan = require("../models/loan");
 const loanSchema = require("../schema/loan");
+const Payment = require("../models/payment");
+const paymentSchema = require("../schema/payment");
 
 const addLoan = async (req, res) => {
   // console.log(req.user);
@@ -25,7 +27,21 @@ const addLoan = async (req, res) => {
     await newLoan.save();
     req.user.loanArray.push(newLoan);
     await req.user.save();
-    res.json({ newLoan });
+    if (tagType === "loan") {
+      let newPayment = new Payment({
+        amount: amount,
+        date: new Date(),
+        tagType: "loan",
+        loanid: newLoan._id,
+        paymentType: "credit",
+      });
+      await newPayment.save();
+      req.user.paymentArray.push(newPayment);
+      await req.user.save();
+      res.json({ newLoan, newPayment });
+    } else {
+      res.json({ newLoan });
+    }
   } else {
     res.status(401).json({ message: "Not authenticated" });
   }
@@ -66,7 +82,11 @@ const deleteLoan = async (req, res) => {
     if (!loan) {
       return res.status(404).json({ message: "Loan not found" });
     }
-    await loan.remove();
+    await Loan.findByIdAndDelete(req.params.id);
+    req.user.loanArray = req.user.loanArray.filter(
+      (loan) => loan._id.toString() !== req.params.id
+    );
+    await req.user.save();
     res.json({ message: "Loan deleted" });
   } else {
     res.status(401).json({ message: "Not authenticated" });

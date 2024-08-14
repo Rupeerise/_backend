@@ -18,6 +18,7 @@ const addPayment = async (req, res) => {
       isDone,
     });
     if (error) {
+      // console.log(error.message);
       return res.status(400).json({ message: error.message });
     }
     await req.user.populate("tagArray");
@@ -29,6 +30,7 @@ const addPayment = async (req, res) => {
       paymentType,
       isDone,
     });
+    // console.log(newPayment);
     await newPayment.save();
     req.user.paymentArray.push(newPayment);
     await req.user.save();
@@ -99,8 +101,7 @@ const getPaymentArray = async (req, res) => {
     });
 
     // Populate the tagArray
-    await req.user.populate("tagArray");
-
+    // await req.user.populate("tagArray");
     res.json(req.user.paymentArray);
   } else {
     res.status(401).json({ message: "Not authenticated" });
