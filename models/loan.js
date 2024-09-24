@@ -23,6 +23,10 @@ const loan = new Schema({
     enum: ["emi", "loan", "investment"],
     required: true,
   },
+  color: {
+    type: String,
+    required: true,
+  },
 });
 
 const Loan = mongoose.model("Loan", loan);

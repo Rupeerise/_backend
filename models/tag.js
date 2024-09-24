@@ -11,12 +11,16 @@ const tag = new Schema({
   ],
   tagType: {
     type: String,
-    enum: ["income", "variable expense"],
+    enum: ["income", "expense"],
     required: true,
   },
   timePeriod: {
     type: String,
     required: false,
+  },
+  color: {
+    type: String,
+    required: true,
   },
 });
 

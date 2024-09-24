@@ -5,14 +5,16 @@ const targetSchema = require("../schema/target");
 
 const addTag = async (req, res) => {
   if (req.user) {
-    let { name, target, tagType, timePeriod } = req.body;
+    let { name, target, tagType, timePeriod, color } = req.body;
     const { error } = tagSchema.validate({
       name,
       tagType,
       targets: [],
       timePeriod,
+      color,
     });
     if (error) {
+      // console.log(error);
       return res.status(400).json({ message: error.message });
     }
     const date = new Date();
@@ -25,6 +27,7 @@ const addTag = async (req, res) => {
       targets: [],
       tagType,
       timePeriod,
+      color,
     });
     await newTag.save();
     const plsvalidate = newTag._id;
@@ -38,6 +41,7 @@ const addTag = async (req, res) => {
     if (targetError) {
       return res.status(400).json({ message: targetError.message });
     }
+    // console.log(newTag);
     const newTarget = new Target({
       amount: target,
       month,
@@ -49,7 +53,6 @@ const addTag = async (req, res) => {
     await newTag.save();
     req.user.tagArray.push(newTag);
     await req.user.save();
-
     res.json({ newTag });
   } else {
     res.status(401).json({ message: "Not authenticated" });
@@ -59,7 +62,7 @@ const addTag = async (req, res) => {
 const updateTag = async (req, res) => {
   if (req.user) {
     let id = req.params.id;
-    let { name, tagType, timePeriod } = req.body;
+    let { name, tagType, timePeriod, color } = req.body;
     //finding from user's trackingArray
     let update = await Tag.findOne({ _id: id }).populate("targets");
     if (!update) return res.status().json({ message: "Tag not found" });
@@ -67,6 +70,7 @@ const updateTag = async (req, res) => {
     update.name = name;
     update.tagType = tagType;
     update.timePeriod = timePeriod;
+    update.color = color;
 
     await update.save();
     res.json({ updateTag: update });

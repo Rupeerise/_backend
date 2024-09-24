@@ -6,6 +6,7 @@ const loanSchema = Joi.object({
   interestRate: Joi.number().required(),
   timePeriod: Joi.number().required(),
   tagType: Joi.string().valid("emi", "loan", "investment").required(),
+  color: Joi.string().required(),
 });
 
 module.exports = loanSchema;
