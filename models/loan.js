@@ -14,10 +14,6 @@ const loan = new Schema({
     type: Number,
     required: true,
   },
-  timePeriod: {
-    type: Number,
-    required: true,
-  },
   tagType: {
     type: String,
     enum: ["emi", "loan", "investment"],

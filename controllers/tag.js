@@ -62,14 +62,12 @@ const addTag = async (req, res) => {
 const updateTag = async (req, res) => {
   if (req.user) {
     let id = req.params.id;
-    let { name, tagType, timePeriod, color } = req.body;
+    let { name, color } = req.body;
     //finding from user's trackingArray
     let update = await Tag.findOne({ _id: id }).populate("targets");
     if (!update) return res.status().json({ message: "Tag not found" });
 
     update.name = name;
-    update.tagType = tagType;
-    update.timePeriod = timePeriod;
     update.color = color;
 
     await update.save();

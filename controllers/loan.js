@@ -6,12 +6,11 @@ const paymentSchema = require("../schema/payment");
 const addLoan = async (req, res) => {
   // console.log(req.user);
   if (req.user) {
-    let { name, amount, interestRate, timePeriod, tagType, color } = req.body;
+    let { name, amount, interestRate, tagType, color } = req.body;
     const { error } = loanSchema.validate({
       name,
       amount,
       interestRate,
-      timePeriod,
       tagType,
       color,
     });
@@ -22,7 +21,6 @@ const addLoan = async (req, res) => {
       name,
       amount,
       interestRate,
-      timePeriod,
       tagType,
       color,
     });
@@ -52,12 +50,11 @@ const addLoan = async (req, res) => {
 
 const updateLoan = async (req, res) => {
   if (req.user) {
-    let { name, amount, interestRate, timePeriod, tagType } = req.body;
+    let { name, amount, interestRate, tagType } = req.body;
     const { error } = loanSchema.validate({
       name,
       amount,
       interestRate,
-      timePeriod,
       tagType,
     });
     if (error) {
@@ -70,7 +67,6 @@ const updateLoan = async (req, res) => {
     loan.name = name;
     loan.amount = amount;
     loan.interestRate = interestRate;
-    loan.timePeriod = timePeriod;
     loan.tagType = tagType;
     await loan.save();
     res.json({ loan });
