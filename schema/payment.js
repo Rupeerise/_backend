@@ -5,7 +5,7 @@ const paymentSchema = Joi.object({
   loanid: Joi.string().allow(null, "").optional(),
   amount: Joi.number().required(),
   date: Joi.date().required(),
-  paymentType: Joi.string().valid("credit", "debit").required(),
+  paymentType: Joi.string().valid("paid", "received").required(),
   isDone: Joi.boolean().default(false),
 }).or("tagid", "loanid"); // Ensure at least one of tagid or loanid is present
 

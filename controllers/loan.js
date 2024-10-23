@@ -25,7 +25,6 @@ const addLoan = async (req, res) => {
       color,
     });
     await newLoan.save();
-    // console.log(newLoan);
     req.user.loanArray.push(newLoan);
     await req.user.save();
     if (tagType === "loan") {
@@ -34,7 +33,7 @@ const addLoan = async (req, res) => {
         date: new Date(),
         tagType: "loan",
         loanid: newLoan._id,
-        paymentType: "credit",
+        paymentType: "received",
       });
       await newPayment.save();
       req.user.paymentArray.push(newPayment);

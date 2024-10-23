@@ -5,12 +5,11 @@ const targetSchema = require("../schema/target");
 
 const addTag = async (req, res) => {
   if (req.user) {
-    let { name, target, tagType, timePeriod, color } = req.body;
+    let { name, target, tagType, color } = req.body;
     const { error } = tagSchema.validate({
       name,
       tagType,
       targets: [],
-      timePeriod,
       color,
     });
     if (error) {
@@ -26,7 +25,6 @@ const addTag = async (req, res) => {
       name,
       targets: [],
       tagType,
-      timePeriod,
       color,
     });
     await newTag.save();

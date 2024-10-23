@@ -99,9 +99,6 @@ const getPaymentArray = async (req, res) => {
         },
       ],
     });
-
-    // Populate the tagArray
-    // await req.user.populate("tagArray");
     res.json(req.user.paymentArray);
   } else {
     res.status(401).json({ message: "Not authenticated" });

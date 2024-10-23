@@ -24,7 +24,7 @@ const paymentSchema = new Schema({
   },
   paymentType: {
     type: String,
-    enum: ["credit", "debit"],
+    enum: ["paid", "received"],
     required: true,
   },
   isDone: {
